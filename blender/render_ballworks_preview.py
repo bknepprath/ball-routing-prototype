@@ -6,7 +6,7 @@ from mathutils import Vector
 
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-BLEND = os.path.join(ROOT, "assets", "ballworks_structure.blend")
+BLEND = os.path.join(ROOT, "blender", "sources", "ballworks_structure.blend")
 OUTPUT = os.path.join(ROOT, "assets", "ballworks_preview.png")
 
 

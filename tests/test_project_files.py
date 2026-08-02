@@ -10,8 +10,10 @@ def test_project_layout() -> None:
     assert (ROOT / "scripts" / "main.gd").is_file()
     assert (ROOT / "scripts" / "ball.gd").is_file()
     assert (ROOT / "scripts" / "attachment.gd").is_file()
-    assert (ROOT / "assets" / "finish_frame.glb").is_file()
-    assert (ROOT / "assets" / "wood_beam.glb").is_file()
+    for asset_name in ("ballworks_structure", "finish_frame", "wood_beam"):
+        assert (ROOT / "assets" / f"{asset_name}.glb").is_file()
+        assert (ROOT / "blender" / "sources" / f"{asset_name}.blend").is_file()
+        assert not (ROOT / "assets" / f"{asset_name}.blend").exists()
     assert (ROOT / "blender" / "create_wood_beam_asset.py").is_file()
     assert (ROOT / "blender" / "create_finish_frame_asset.py").is_file()
     assert (ROOT / "tests" / "test_level_chain_runtime.gd").is_file()

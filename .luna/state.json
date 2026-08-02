@@ -8,8 +8,8 @@
   },
   "orchestrator": {
     "status": "ready",
-    "last_run_at": "2026-08-02T04:13:01Z",
-    "last_run_id": "RUN-20260802T041301Z-PR2-REVIEW",
+    "last_run_at": "2026-08-02T05:30:10Z",
+    "last_run_id": "RUN-20260802T053010Z-COLD-IMPORT",
     "next_action": "implement_P-002"
   },
   "limits": {
@@ -124,6 +124,20 @@
   ],
   "handoffs": [
     {
+      "sender": "cold-import-infrastructure-agent",
+      "recipient": "codex-platform-pull-request-writeback",
+      "priority": "P-001",
+      "status": "ready_for_writeback",
+      "pull_request": 2,
+      "writeback_id": "PR-2-cold-import-repair",
+      "durable_evidence": [
+        "The bounded infrastructure repair is committed locally for writeback to codex/cloud-production; no Git remote is configured.",
+        "Raw Blender sources and backups moved from assets to the Godot-ignored blender/sources directory while runtime GLBs remained in assets.",
+        "A cold Godot 4.5.1 editor import completed after removing only the generated .godot cache; Blender 4.0.2 remains installed.",
+        "P-002, P-003, and P-004 statuses and all locks were left unchanged."
+      ]
+    },
+    {
       "sender": "workflow-repair-agent",
       "recipient": "codex-platform-pull-request-writeback",
       "priority": "P-001",
@@ -151,6 +165,31 @@
     }
   ],
   "run_history": [
+    {
+      "run_id": "RUN-20260802T053010Z-COLD-IMPORT",
+      "started_at": "2026-08-02T05:22:30Z",
+      "finished_at": "2026-08-02T05:30:10Z",
+      "status": "completed_with_test_failures",
+      "bounded_pass": 1,
+      "implementation_priorities_started": 0,
+      "active_priority_count_at_start": 3,
+      "active_priority_count_at_end": 3,
+      "actions": [
+        "Moved the three tracked .blend sources and two tracked .blend1 backups from assets to blender/sources, added blender/.gdignore, and removed obsolete tracked .blend.import metadata.",
+        "Updated all four Blender generation/preview scripts so .blend sources use blender/sources and runtime GLB or preview outputs remain in assets.",
+        "Added project assertions covering the three runtime GLBs, relocated sources, and absence of raw .blend files from assets.",
+        "Removed only the generated .godot cache from the initially clean task checkout and completed `timeout 180 godot --headless --path . --editor --quit` from cold state.",
+        "`python tests/test_project_files.py` passed and Blender 4.0.2 remained installed.",
+        "`timeout 180 godot --headless --path . --script tests/test_room_runtime.gd` reported `Moving wall has no collision shape`.",
+        "`timeout 180 godot --headless --path . --script tests/test_level_chain_runtime.gd` reported `Generation 0 did not produce both arc directions`.",
+        "`timeout 180 godot --headless --path . --script tests/test_multi_ball_flow_runtime.gd` reported `Auto-spawn flow deadlocked before the finish`.",
+        "`timeout 180 godot --headless --path . --script tests/test_ball_load_runtime.gd` reported `Load test exceeded the shadow caster budget`.",
+        "Kept the run infrastructure-only and did not change P-002, P-003, or P-004 status or locks."
+      ],
+      "direct_git_remote": false,
+      "push_status": "pending_platform_writeback",
+      "writeback": "PR-2-cold-import-repair"
+    },
     {
       "run_id": "RUN-20260802T041301Z-PR2-REVIEW",
       "started_at": "2026-08-02T04:13:01Z",
