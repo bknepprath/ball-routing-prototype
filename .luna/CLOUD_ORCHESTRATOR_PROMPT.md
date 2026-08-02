@@ -4,7 +4,7 @@ Operate only in `bknepprath/ball-routing-prototype` on the persistent `codex/clo
 
 ## Durable state
 
-At the start of every run, fetch the branch when a Git remote exists and read `AGENTS.md`, `.luna/state.json`, and `.luna/PRD.html`. Treat `.luna/state.json` as authoritative for priorities, proposals, locks, reviews, handoffs, and run history. Do not rely on chat memory or temporary container state. Render the PRD with `python .luna/render_prd.py` and require `python .luna/render_prd.py --check` before persistence.
+At the start of every run, fetch the branch when a Git remote exists and read `AGENTS.md`, `.luna/state.json`, and `.luna/PRD.html`. Treat `.luna/state.json` as authoritative for priorities, proposals, locks, reviews, handoffs, and run history. Do not rely on chat memory or temporary container state. Run `python .luna/render_prd.py --check` against the existing PRD before any regeneration. If the PRD is missing or stale, wake the PRD Maintainer; only that role then runs `python .luna/render_prd.py` and re-runs `python .luna/render_prd.py --check`. Never overwrite drift before detecting it.
 
 Persist every durable state transition through normal Git commit and push when a remote exists. When no remote is configured, commit locally, expose the complete diff through Codex platform pull-request/writeback, and record a durable handoff in state so a later run can reconcile the production branch. A missing `origin` is neither evidence of a successful push nor a permanent block; report the actual persistence path and exit the bounded run.
 

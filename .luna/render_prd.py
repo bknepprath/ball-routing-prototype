@@ -29,20 +29,41 @@ def items(values):
     return "<ul>" + "".join(f"<li>{html.escape(str(value))}</li>" for value in values) + "</ul>" if values else "None"
 
 
-def row(priority):
+def workflow_evidence(priority, state):
+    entries = []
+    for review in state.get("reviews", []):
+        if review["priority"] == priority["id"]:
+            entries.append("<h4>Review</h4><dl>"
+                           f'<dt>Implementation commit</dt><dd>{html.escape(review["implementation_commit"])}</dd>'
+                           f'<dt>Reviewer</dt><dd>{html.escape(review["reviewer"])}</dd>'
+                           f'<dt>Decision</dt><dd>{html.escape(review["decision"])}</dd>'
+                           f'<dt>Validation evidence</dt><dd>{items(review["evidence"])}</dd>'
+                           f'<dt>Required changes</dt><dd>{items(review["required_changes"])}</dd></dl>')
+    for handoff in state.get("handoffs", []):
+        if handoff["priority"] == priority["id"]:
+            entries.append("<h4>Handoff</h4><dl>"
+                           f'<dt>Sender</dt><dd>{html.escape(handoff["sender"])}</dd>'
+                           f'<dt>Recipient</dt><dd>{html.escape(handoff["recipient"])}</dd>'
+                           f'<dt>Status</dt><dd>{html.escape(handoff["status"])}</dd>'
+                           f'<dt>Durable evidence</dt><dd>{items(handoff["durable_evidence"])}</dd></dl>')
+    return "".join(entries) or "None"
+
+
+def row(priority, state):
     checked = " checked" if priority["checked"] else ""
     return (f'<tr><td><input type="checkbox"{checked} disabled></td><td>{priority["rank"]}</td>'
             f'<td><strong>{html.escape(priority["id"])}</strong> {html.escape(priority["title"])}</td>'
             f'<td>{html.escape(priority["subject"])}</td><td class="status">{html.escape(priority["status"])}</td>'
             f'<td>{items(priority["acceptance_criteria"])}</td><td>{items(priority["dependencies"])}</td>'
-            f'<td>{items(priority["blockers"])}</td><td>{items(priority["completion_evidence"])}</td></tr>')
+            f'<td>{items(priority["blockers"])}</td><td>{items(priority["completion_evidence"])}</td>'
+            f'<td>{workflow_evidence(priority, state)}</td></tr>')
 
 
-def table(priorities, show_subject=True):
+def table(priorities, state, show_subject=True):
     subject = "<th>Subject</th>" if show_subject else ""
-    body = "".join(row(p) if show_subject else row(p).replace(f'<td>{html.escape(p["subject"])}</td>', "", 1) for p in priorities)
+    body = "".join(row(p, state) if show_subject else row(p, state).replace(f'<td>{html.escape(p["subject"])}</td>', "", 1) for p in priorities)
     return ('<div class="priority-table"><table><thead><tr><th>Done</th><th>Rank</th><th>Priority</th>' + subject
-            + '<th>Status</th><th>Acceptance criteria</th><th>Dependencies</th><th>Blockers</th><th>Completion evidence</th>'
+            + '<th>Status</th><th>Acceptance criteria</th><th>Dependencies</th><th>Blockers</th><th>Completion evidence</th><th>Workflow evidence</th>'
             + f'</tr></thead><tbody>{body}</tbody></table></div>')
 
 
@@ -62,6 +83,14 @@ def validate(state):
         if priority["subject"] == "operations" and priority["status"] != "completed":
             raise ValueError("operations is infrastructure/history only; operations priorities must be completed")
         ids.add(priority["id"]); ranks.add(priority["rank"])
+    for kind, fields in (("review", {"priority", "implementation_commit", "reviewer", "decision", "evidence", "required_changes"}),
+                         ("handoff", {"priority", "sender", "recipient", "status", "durable_evidence"})):
+        for record in state.get(f"{kind}s", []):
+            missing = fields - record.keys()
+            if missing:
+                raise ValueError(f"{kind} missing fields: {sorted(missing)}")
+            if record["priority"] not in ids:
+                raise ValueError(f'{kind} references unknown priority {record["priority"]!r}')
     return sorted(priorities, key=lambda value: value["rank"])
 
 
@@ -70,19 +99,26 @@ def render(state):
     panels = []
     for subject, label in PRODUCT_TABS:
         selected = [p for p in priorities if p["subject"] == subject]
-        panels.append(f'<section id="{subject}" class="panel"><h2>{label}</h2>{PRODUCT_CONTENT[subject]}<h3>Priorities</h3>{table(selected, False)}</section>')
+        panels.append(f'<section id="{subject}" class="panel"><h2>{label}</h2>{PRODUCT_CONTENT[subject]}<h3>Priorities</h3>{table(selected, state, False)}</section>')
     completed_operations = [p for p in priorities if p["subject"] == "operations" and p["status"] == "completed"]
-    return f'''<!doctype html>
+    rendered = f'''<!doctype html>
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Ball Routing Prototype PRD</title><style>
 :root{{font:16px/1.5 system-ui,sans-serif;color:#172033;background:#f4f6f8}}body{{max-width:1200px;margin:auto;padding:24px}}h1{{margin:0 0 20px}}.tabs{{display:flex;gap:8px;border-bottom:1px solid #bcc5d1}}.tabs button{{border:0;background:none;padding:12px 16px;font:inherit;cursor:pointer}}.tabs button[aria-selected="true"]{{border-bottom:3px solid #185adb;font-weight:700}}.panel{{display:none;background:#fff;padding:24px}}.panel.active{{display:block}}table{{width:100%;border-collapse:collapse}}th,td{{text-align:left;vertical-align:top;border:1px solid #d8dee8;padding:8px}}th{{background:#eef2f7}}.status{{white-space:nowrap}}ul{{margin:0;padding-left:20px}}@media(max-width:760px){{body{{padding:12px}}.tabs{{overflow:auto}}.panel{{padding:14px}}.priority-table{{overflow:auto}}}}
 </style></head><body><h1>Ball Routing Prototype</h1>
 <nav class="tabs" aria-label="PRD sections"><button aria-selected="true" aria-controls="overview">Overview</button><button aria-selected="false" aria-controls="design">Design</button><button aria-selected="false" aria-controls="gameplay_systems">Gameplay Systems</button><button aria-selected="false" aria-controls="gameplay">Gameplay</button></nav>
-<section id="overview" class="panel active"><h2>Overview</h2><p>Canonical ranked production priorities for the desktop 3D ball-routing game.</p><h3>Combined priority checklist</h3>{table(priorities)}<h3>Completed operations</h3>{table(completed_operations)}</section>
+<section id="overview" class="panel active"><h2>Overview</h2><p>Canonical ranked production priorities for the desktop 3D ball-routing game.</p><h3>Combined priority checklist</h3>{table(priorities, state)}<h3>Completed operations</h3>{table(completed_operations, state)}</section>
 {''.join(panels)}
 <script>const buttons=[...document.querySelectorAll('.tabs button')];buttons.forEach(button=>button.addEventListener('click',()=>{{buttons.forEach(item=>item.setAttribute('aria-selected',String(item===button)));document.querySelectorAll('.panel').forEach(panel=>panel.classList.toggle('active',panel.id===button.getAttribute('aria-controls')));}}));</script>
 </body></html>
 '''
+    for review in state.get("reviews", []):
+        if html.escape(review["implementation_commit"]) not in rendered or html.escape(review["reviewer"]) not in rendered:
+            raise ValueError(f'review evidence for {review["priority"]} disappeared from rendered output')
+    for handoff in state.get("handoffs", []):
+        if html.escape(handoff["sender"]) not in rendered or html.escape(handoff["recipient"]) not in rendered:
+            raise ValueError(f'handoff evidence for {handoff["priority"]} disappeared from rendered output')
+    return rendered
 
 
 def main():
