@@ -1,0 +1,87 @@
+{
+  "schema_version": 1,
+  "project": {
+    "repository": "bknepprath/ball-routing-prototype",
+    "default_branch": "main",
+    "production_branch": "codex/cloud-production",
+    "pull_request": null
+  },
+  "orchestrator": {
+    "status": "ready",
+    "last_run_at": null,
+    "last_run_id": null,
+    "next_action": "verify_cloud_environment"
+  },
+  "limits": {
+    "max_active_priorities": 30,
+    "max_implementation_priorities_per_run": 1
+  },
+  "priorities": [
+    {
+      "id": "P-001",
+      "subject": "Verify the cloud validation environment",
+      "rank": 1,
+      "status": "blocked",
+      "checked": false,
+      "acceptance_criteria": [
+        "The cloud setup script installs Godot 4.5.1.",
+        "The project import check and project-file test pass in Codex Cloud.",
+        "A cloud task can commit changes to the production branch."
+      ],
+      "dependencies": [],
+      "completion_evidence": [],
+      "blocked_reason": "Cloud environment and repository writeback are not yet verified."
+    },
+    {
+      "id": "P-002",
+      "subject": "Clarify the first playable session",
+      "rank": 2,
+      "status": "queued",
+      "checked": false,
+      "acceptance_criteria": [
+        "A new player can identify how to drop a ball and open the first gate without reading the README.",
+        "Required controls are visible without expanding optional controls.",
+        "The main interaction remains usable at 1440 by 900."
+      ],
+      "dependencies": ["P-001"],
+      "completion_evidence": [],
+      "blocked_reason": null
+    },
+    {
+      "id": "P-003",
+      "subject": "Improve route and interaction readability",
+      "rank": 3,
+      "status": "queued",
+      "checked": false,
+      "acceptance_criteria": [
+        "Entry, route direction, damage gates, upgrades, and finish are visually distinct during play.",
+        "Labels remain readable against the scene from the default camera.",
+        "Visual changes preserve mobile-renderer compatibility."
+      ],
+      "dependencies": ["P-001"],
+      "completion_evidence": [],
+      "blocked_reason": null
+    },
+    {
+      "id": "P-004",
+      "subject": "Define progression and replay goals",
+      "rank": 4,
+      "status": "queued",
+      "checked": false,
+      "acceptance_criteria": [
+        "Spawn rate, ball value, and ball damage upgrades create distinct useful choices.",
+        "The interface communicates the next meaningful goal and its cost.",
+        "Randomizing the route does not erase earned progression unless the PRD explicitly requires it."
+      ],
+      "dependencies": ["P-002"],
+      "completion_evidence": [],
+      "blocked_reason": null
+    }
+  ],
+  "proposals": [],
+  "locks": [],
+  "reviews": [],
+  "handoffs": [],
+  "run_history": []
+}
+
