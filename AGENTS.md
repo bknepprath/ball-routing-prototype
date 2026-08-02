@@ -41,3 +41,10 @@ There is no separate build step. Godot imports and validates the project with th
 - Use the dedicated `codex/cloud-production` branch or its pull request. Never merge into the default branch without explicit user authorization.
 - Each run must be bounded, release failed or expired locks, persist results, and exit.
 - After changing `.luna/state.json` or the PRD renderer, regenerate with `python .luna/render_prd.py`; validate committed PRD synchronization with `python .luna/render_prd.py --check`.
+- The orchestrator and every production subagent must use model Luna with Max reasoning effort. If Luna Max is unavailable, persist a blocked handoff and stop; do not substitute another model or effort.
+- Reconcile the game, branch, durable state, and synchronized PRD using only repository files and the current run. Do not use unrelated task history.
+- When fewer than 30 usable active product priorities exist, explicitly spawn independent read-only Design, Gameplay Systems, and Gameplay brainstormers in parallel. Design owns visual fidelity, graphics, UI, animation, VFX, art consistency, readability, and player feedback.
+- After all three brainstormers finish, run a Proposal Checker, then a Priority Curator. Reject duplicate, vague, unsupported, completed, conflicting, or non-testable proposals; keep one ranked To Do List with at most 30 active items across `design`, `gameplay_systems`, and `gameplay`.
+- For the highest-ranked feasible item, assign one Gameplay Code Agent with exact allowed files, acceptance criteria, validation, and exclusions. Then run independent Code Review and Validation agents in parallel. Repeat implementation and both checks when either fails; archive only after both pass.
+- Never give concurrent writing agents overlapping files. Persist state, PRD, locks, run history, evidence, and handoffs before the bounded run exits. Never claim a check passed unless it ran successfully.
+- Do not perform game builds, implementation, or CPU-heavy validation in the local orchestration checkout; those actions belong in the bounded cloud task. Do not create Local or Worktree scheduled tasks.

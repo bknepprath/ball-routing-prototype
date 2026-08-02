@@ -39,3 +39,69 @@ Every priority has `id`, `title`, `subject`, `rank`, `status`, `checked`, `accep
 Use atomic commits for implementation, review/state, and PRD refinement when practical. Before pushing to an available remote, pull or fetch and reconcile concurrent branch changes without discarding work. A failed push leaves the task blocked with a handoff; it must not be reported complete. Absence of a remote instead uses the Codex platform persistence path described above.
 
 At run end, update run history, clear or release all finished locks, commit and push state, report the bounded result, and exit. Never start a daemon, watcher, scheduler, or unbounded worker loop from inside a run.
+
+## Authoritative multi-agent production graph
+
+The following rules supersede any less-specific role eligibility wording above for the bounded production run:
+
+- The orchestrator and every subagent must use Luna with Max reasoning effort. Verify this before work begins; if unavailable, persist a blocked handoff/status and stop.
+- Use only the repository, `AGENTS.md`, `.luna/PRD.html`, `.luna/state.json`, `.luna/logs/`, `.luna/locks/`, this prompt, and current-run outputs. Do not consult unrelated Codex task history.
+- Inspect the current game and reconcile state with the repository before changing product work. `state.json` is authoritative and the generated PRD must remain synchronized.
+- Maintain one ranked To Do List with at most 30 active product items across `design`, `gameplay_systems`, and `gameplay`; completed `operations` history does not count.
+- When fewer than 30 usable items exist, explicitly spawn the three read-only brainstormers simultaneously and wait for all three. Their proposals must be repository-grounded and include testable acceptance criteria and validation.
+- The Proposal Checker rejects duplicates, vague ideas, unsupported assumptions, completed work, conflicts, and proposals without testable acceptance criteria. The Priority Curator merges accepted proposals and ranks them by blockers, player impact, dependencies, risk, and effort.
+- The Gameplay Code Agent receives only the highest-ranked feasible item, exact allowed files, acceptance criteria, validation commands, and exclusions. Code Review and Validation agents run independently and simultaneously after implementation. If either fails, return concrete findings to the code agent and repeat. Complete and archive an item only after both pass.
+- Do not let concurrent writing agents edit overlapping files. Persist every transition, lock, review, evidence record, run-history entry, PRD update, and handoff before the bounded run exits. Never claim an unrun check passed. Use Codex platform PR/writeback when the checkout has no Git remote; never merge `main`.
+
+```mermaid
+flowchart TB
+    INSPECT["Project Analyst — Luna Max&lt;br/&gt;Inspect the existing game&lt;br/&gt;Output: project summary"]
+    PRD["PRD Maintainer — Luna Max&lt;br/&gt;Load or create PRD and state&lt;br/&gt;Output: current project context"]
+    INSPECT --&gt; PRD
+
+    NEED_IDEAS{"Fewer than 30&lt;br/&gt;usable items?"}
+    PRD --&gt; NEED_IDEAS
+
+    DESIGN["Design Brainstormer — Luna Max&lt;br/&gt;Visuals, UI, animation, VFX, and graphics&lt;br/&gt;Output: design proposals"]
+    SYSTEMS["Systems Brainstormer — Luna Max&lt;br/&gt;Progression, balance, economy, saves, and architecture&lt;br/&gt;Output: systems proposals"]
+    GAMEPLAY["Gameplay Brainstormer — Luna Max&lt;br/&gt;Controls, combat, movement, pacing, and player experience&lt;br/&gt;Output: gameplay proposals"]
+
+    NEED_IDEAS --&gt;|"Yes — parallel"| DESIGN
+    NEED_IDEAS --&gt;|"Yes — parallel"| SYSTEMS
+    NEED_IDEAS --&gt;|"Yes — parallel"| GAMEPLAY
+
+    CHECKER["Proposal Checker — Luna Max&lt;br/&gt;Reject invalid, duplicate, or vague proposals&lt;br/&gt;Output: accepted proposals"]
+    DESIGN --&gt; CHECKER
+    SYSTEMS --&gt; CHECKER
+    GAMEPLAY --&gt; CHECKER
+
+    CURATOR["Priority Curator — Luna Max&lt;br/&gt;Rank accepted proposals&lt;br/&gt;Output: To Do List"]
+    CHECKER --&gt; CURATOR
+
+    AVAILABLE{"Feasible unchecked&lt;br/&gt;item available?"}
+    CURATOR --&gt; AVAILABLE
+    NEED_IDEAS --&gt;|"No"| AVAILABLE
+
+    CODE["Gameplay Code Agent — Luna Max&lt;br/&gt;Implement the highest-priority item&lt;br/&gt;Output: code and test results"]
+    AVAILABLE --&gt;|"Yes"| CODE
+
+    REVIEW["Code Review Agent — Luna Max&lt;br/&gt;Check correctness and regressions"]
+    VALIDATE["Validation Agent — Luna Max&lt;br/&gt;Build, test, and verify criteria"]
+    CODE --&gt; REVIEW
+    CODE --&gt; VALIDATE
+
+    APPROVED{"Review and validation&lt;br/&gt;both passed?"}
+    REVIEW --&gt; APPROVED
+    VALIDATE --&gt; APPROVED
+    APPROVED --&gt;|"No"| CODE
+
+    COMPLETE["PRD Maintainer — Luna Max&lt;br/&gt;Archive item and persist state"]
+    APPROVED --&gt;|"Yes"| COMPLETE
+    COMPLETE --&gt; NEED_IDEAS
+
+    FINISH["Persist status and finish run"]
+    AVAILABLE --&gt;|"No"| FINISH
+    FINISH -.-&gt;|"Next cloud run resumes"| PRD
+```
+
+Each run remains bounded: start one run, release failed or expired locks, perform at most one implementation priority, persist all durable outputs, and exit so the next cloud run can resume at the PRD Maintainer step. Do not create a Local or Worktree scheduled task and do not claim 24/7 recurrence unless a genuine cloud schedule exists.
