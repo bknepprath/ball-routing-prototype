@@ -4,9 +4,11 @@ Operate only in `bknepprath/ball-routing-prototype` on the persistent `codex/clo
 
 ## Durable state
 
-At the start of every run, fetch the branch and read `AGENTS.md`, `.luna/state.json`, and `.luna/PRD.html`. Treat `.luna/state.json` as authoritative for priorities, proposals, locks, reviews, handoffs, and run history. Do not rely on chat memory or temporary container state. Commit and push every durable state transition before exiting.
+At the start of every run, fetch the branch when a Git remote exists and read `AGENTS.md`, `.luna/state.json`, and `.luna/PRD.html`. Treat `.luna/state.json` as authoritative for priorities, proposals, locks, reviews, handoffs, and run history. Do not rely on chat memory or temporary container state. Run `python .luna/render_prd.py --check` against the existing PRD before any regeneration. If the PRD is missing or stale, wake the PRD Maintainer; only that role then runs `python .luna/render_prd.py` and re-runs `python .luna/render_prd.py --check`. Never overwrite drift before detecting it.
 
-If `.luna/PRD.html` is missing, wake the PRD Maintainer first. The PRD Maintainer must keep it readable, self-contained HTML with clickable Overview, Design, Gameplay Systems, and Gameplay tabs. Design covers visual fidelity, graphics, animation direction, interface presentation, and visual readability; do not create a separate graphics agent. The PRD must include the ranked priority checklist and keep completed priorities visible.
+Persist every durable state transition through normal Git commit and push when a remote exists. When no remote is configured, commit locally, expose the complete diff through Codex platform pull-request/writeback, and record a durable handoff in state so a later run can reconcile the production branch. A missing `origin` is neither evidence of a successful push nor a permanent block; report the actual persistence path and exit the bounded run.
+
+If `.luna/PRD.html` is missing or fails the renderer check, wake the PRD Maintainer first. The PRD Maintainer must keep the deterministic output readable, self-contained HTML with clickable Overview, Design, Gameplay Systems, and Gameplay tabs. Design owns visual fidelity, graphics, animation direction, interface presentation, and visual readability; do not create a separate graphics agent. The Overview must include the combined ranked checklist and completed operations history. Each product tab must show its subject priorities and their full workflow evidence. Perform periodic PRD readability audits after priority changes and at least once every ten completed orchestration runs; record the audit in run history and change the renderer rather than hand-editing generated HTML.
 
 ## Run algorithm
 
@@ -32,8 +34,8 @@ Do not mark work complete before independent approval. After approval, check off
 
 ## State rules
 
-Every priority has `id`, `subject`, `rank`, `status`, `checked`, `acceptance_criteria`, `dependencies`, and `completion_evidence`. Every lock records priority, worker, run ID, acquisition time, expiry time, and status. Every review identifies the implementation commit, reviewer, decision, evidence, and required changes. Every handoff identifies sender, recipient, priority, status, and durable evidence.
+Every priority has `id`, `title`, `subject`, `rank`, `status`, `checked`, `acceptance_criteria`, `dependencies`, `blockers`, and `completion_evidence`. Subjects are exactly `operations`, `design`, `gameplay_systems`, or `gameplay`; operations is infrastructure/history only and cannot hold product work. Every lock records priority, worker, run ID, acquisition time, expiry time, and status. Every review identifies the implementation commit, reviewer, decision, evidence, and required changes. Every handoff identifies sender, recipient, priority, status, and durable evidence.
 
-Use atomic commits for implementation, review/state, and PRD refinement when practical. Before pushing, pull or fetch and reconcile concurrent branch changes without discarding work. A failed push leaves the task blocked with a handoff; it must not be reported complete.
+Use atomic commits for implementation, review/state, and PRD refinement when practical. Before pushing to an available remote, pull or fetch and reconcile concurrent branch changes without discarding work. A failed push leaves the task blocked with a handoff; it must not be reported complete. Absence of a remote instead uses the Codex platform persistence path described above.
 
 At run end, update run history, clear or release all finished locks, commit and push state, report the bounded result, and exit. Never start a daemon, watcher, scheduler, or unbounded worker loop from inside a run.

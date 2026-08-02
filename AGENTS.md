@@ -18,18 +18,18 @@ Run the smallest relevant check, then the full bounded suite before approval:
 
 ```bash
 python tests/test_project_files.py
-godot --headless --path . --editor --quit
-godot --headless --path . --script tests/test_room_runtime.gd
-godot --headless --path . --script tests/test_level_chain_runtime.gd
-godot --headless --path . --script tests/test_multi_ball_flow_runtime.gd
-godot --headless --path . --script tests/test_ball_load_runtime.gd
+timeout 180 godot --headless --path . --editor --quit
+timeout 180 godot --headless --path . --script tests/test_room_runtime.gd
+timeout 180 godot --headless --path . --script tests/test_level_chain_runtime.gd
+timeout 180 godot --headless --path . --script tests/test_multi_ball_flow_runtime.gd
+timeout 180 godot --headless --path . --script tests/test_ball_load_runtime.gd
 ```
 
 The slower acceptance checks are:
 
 ```bash
-godot --headless --path . --script tests/test_end_to_end_runtime.gd
-godot --headless --path . --script tests/test_traversability_stress.gd
+timeout 180 godot --headless --path . --script tests/test_end_to_end_runtime.gd
+timeout 180 godot --headless --path . --script tests/test_traversability_stress.gd
 ```
 
 There is no separate build step. Godot imports and validates the project with the editor command above.
@@ -40,4 +40,4 @@ There is no separate build step. Godot imports and validates the project with th
 - `.luna/state.json` is authoritative for queues, locks, reviews, and handoffs. Persist every transition in the repository.
 - Use the dedicated `codex/cloud-production` branch or its pull request. Never merge into the default branch without explicit user authorization.
 - Each run must be bounded, release failed or expired locks, persist results, and exit.
-
+- After changing `.luna/state.json` or the PRD renderer, regenerate with `python .luna/render_prd.py`; validate committed PRD synchronization with `python .luna/render_prd.py --check`.
