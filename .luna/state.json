@@ -8,9 +8,9 @@
   },
   "orchestrator": {
     "status": "ready",
-    "last_run_at": "2026-08-02T04:13:01Z",
-    "last_run_id": "RUN-20260802T041301Z-PR2-REVIEW",
-    "next_action": "implement_P-002"
+    "last_run_at": "2026-08-02T05:00:00Z",
+    "last_run_id": "RUN-20260802T050000Z-P002-GAMEPLAY",
+    "next_action": "independent_review_P-002"
   },
   "limits": {
     "max_active_priorities": 30,
@@ -48,7 +48,7 @@
       "title": "Clarify the first playable session",
       "subject": "gameplay",
       "rank": 2,
-      "status": "queued",
+      "status": "review",
       "checked": false,
       "acceptance_criteria": [
         "A new player can identify how to drop a ball and open the first gate without reading the README.",
@@ -58,7 +58,14 @@
       "dependencies": [
         "P-001"
       ],
-      "completion_evidence": [],
+      "completion_evidence": [
+        "Added an always-visible FirstSessionPrompt stating that Space drops a ball and ball impacts open the STOP gate.",
+        "Moved the DropBallButton outside the collapsed optional controls while preserving its connection to the existing `_spawn_ball` action.",
+        "Added targeted room-runtime assertions for exact instructional purpose, default visibility, separation from optional controls, and bounds within 1440x900.",
+        "`python tests/test_project_files.py` passed for this implementation.",
+        "`python .luna/render_prd.py --check`, JSON validation, Python byte-compilation, and whitespace/diff checks passed.",
+        "Godot was intentionally not run in this bounded task. A prior cloud attempt passed `timeout 180 godot --headless --path . --editor --quit` once; its subsequent cold `test_room_runtime.gd` import timed out and produced no durable pull request. The Independent Code Review Agent must rerun Godot validation."
+      ],
       "blockers": [],
       "blocked_reason": null
     },
@@ -102,7 +109,16 @@
     }
   ],
   "proposals": [],
-  "locks": [],
+  "locks": [
+    {
+      "priority": "P-002",
+      "worker": "Gameplay Code Agent",
+      "run_id": "RUN-20260802T050000Z-P002-GAMEPLAY",
+      "acquired_at": "2026-08-02T05:00:00Z",
+      "expires_at": "2026-08-02T07:00:00Z",
+      "status": "review"
+    }
+  ],
   "reviews": [
     {
       "priority": "P-001",
@@ -148,9 +164,53 @@
         "Write back the complete committed repository diff based on source commit 1709ec690867a0daee3b93845c531ea3aea73230 to the codex/cloud-production pull request.",
         "Pull-request metadata is recorded through the platform make_pr mechanism after the orchestration commit."
       ]
+    },
+    {
+      "sender": "prior-gameplay-code-agent",
+      "recipient": "codex-platform-pull-request-writeback",
+      "priority": "P-002",
+      "status": "failed_non_durable",
+      "durable_evidence": [
+        "The prior cloud attempt passed the bounded Godot editor import once.",
+        "Its subsequent cold room-runtime import timed out.",
+        "The prior attempt produced no durable pull request or implementation handoff; this record preserves that failed non-durable handoff honestly."
+      ]
+    },
+    {
+      "sender": "Gameplay Code Agent",
+      "recipient": "Independent Code Review Agent",
+      "priority": "P-002",
+      "status": "ready_for_independent_review",
+      "durable_evidence": [
+        "Review only P-002 on the platform pull request created from this committed bounded run; keep P-002 unchecked until independent approval.",
+        "Inspect scripts/main.gd and tests/test_room_runtime.gd for the always-visible prompt and primary drop action, and verify no unrelated behavior changed.",
+        "Rerun `timeout 180 godot --headless --path . --editor --quit` and `timeout 180 godot --headless --path . --script tests/test_room_runtime.gd`; Godot was intentionally not run in this task because the prior cold runtime import timed out after one successful editor import.",
+        "Record an independent approved or changes_required decision in canonical state; do not complete P-002 without approval."
+      ]
     }
   ],
   "run_history": [
+    {
+      "run_id": "RUN-20260802T050000Z-P002-GAMEPLAY",
+      "started_at": "2026-08-02T05:00:00Z",
+      "finished_at": "2026-08-02T05:00:00Z",
+      "status": "completed",
+      "bounded_pass": 1,
+      "implementation_priorities_started": 1,
+      "active_priority_count_at_start": 3,
+      "active_priority_count_at_end": 3,
+      "actions": [
+        "Claimed only P-002 with a persisted Gameplay Code Agent lock and run record.",
+        "Implemented the proven minimal first-session prompt and always-visible drop-ball button using the existing spawn action.",
+        "Added targeted P-002 room-runtime assertions without running Godot.",
+        "Recorded the prior failed non-durable handoff and exact handoff to the Independent Code Review Agent.",
+        "Moved P-002 to review, left it unchecked, and kept its review lock active.",
+        "Stopped after one bounded implementation priority without reviewing P-002 or starting another priority."
+      ],
+      "direct_git_remote": false,
+      "push_status": "pending_platform_writeback",
+      "writeback": "create_platform_pull_request"
+    },
     {
       "run_id": "RUN-20260802T041301Z-PR2-REVIEW",
       "started_at": "2026-08-02T04:13:01Z",
