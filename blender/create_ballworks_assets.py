@@ -7,6 +7,7 @@ from mathutils import Vector
 
 PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 ASSET_DIR = os.path.join(PROJECT_ROOT, "assets")
+SOURCE_DIR = os.path.join(PROJECT_ROOT, "blender", "sources")
 OUTPUT = os.path.join(ASSET_DIR, "ballworks_structure.glb")
 
 
@@ -88,6 +89,7 @@ def clear_scene():
 
 def build():
     os.makedirs(ASSET_DIR, exist_ok=True)
+    os.makedirs(SOURCE_DIR, exist_ok=True)
     clear_scene()
 
     tube = material("Wood", (0.26, 0.10, 0.035), metallic=0.0, roughness=0.78)
@@ -115,7 +117,7 @@ def build():
     add_panel("PaymentArchLeft", (7.0, 2.8, -1.8), (0.28, 1.2, 0.18), gold)
     add_panel("PaymentArchRight", (7.0, 2.8, 1.8), (0.28, 1.2, 0.18), gold)
 
-    bpy.ops.wm.save_as_mainfile(filepath=os.path.join(ASSET_DIR, "ballworks_structure.blend"))
+    bpy.ops.wm.save_as_mainfile(filepath=os.path.join(SOURCE_DIR, "ballworks_structure.blend"))
     bpy.ops.object.select_all(action="SELECT")
     bpy.ops.export_scene.gltf(
         filepath=OUTPUT,

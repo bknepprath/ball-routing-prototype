@@ -5,6 +5,7 @@ import bpy
 
 PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 ASSET_DIR = os.path.join(PROJECT_ROOT, "assets")
+SOURCE_DIR = os.path.join(PROJECT_ROOT, "blender", "sources")
 OUTPUT = os.path.join(ASSET_DIR, "wood_beam.glb")
 
 
@@ -25,6 +26,7 @@ def make_material():
 
 def build():
     os.makedirs(ASSET_DIR, exist_ok=True)
+    os.makedirs(SOURCE_DIR, exist_ok=True)
     clear_scene()
     bpy.ops.mesh.primitive_cube_add(size=1.0)
     beam = bpy.context.object
@@ -38,7 +40,7 @@ def build():
     bpy.ops.object.modifier_apply(modifier=bevel.name)
     weighted_normal = beam.modifiers.new("Weighted corner normals", "WEIGHTED_NORMAL")
     weighted_normal.keep_sharp = True
-    bpy.ops.wm.save_as_mainfile(filepath=os.path.join(ASSET_DIR, "wood_beam.blend"))
+    bpy.ops.wm.save_as_mainfile(filepath=os.path.join(SOURCE_DIR, "wood_beam.blend"))
     bpy.ops.object.select_all(action="DESELECT")
     beam.select_set(True)
     bpy.context.view_layer.objects.active = beam
