@@ -14,6 +14,16 @@ SUBJECTS = ("operations", "design", "gameplay_systems", "gameplay")
 PRODUCT_TABS = (("design", "Design"), ("gameplay_systems", "Gameplay Systems"), ("gameplay", "Gameplay"))
 REQUIRED = {"id", "title", "subject", "rank", "status", "checked", "acceptance_criteria", "dependencies", "blockers", "completion_evidence"}
 
+PRODUCT_CONTENT = {
+    "design": '''<h3>Visual fidelity and graphics</h3><p>Use the existing stylized mechanical tower, sky-island setting, beveled wood structures, saturated interaction colors, and mobile renderer. New assets must match the existing authored geometry and materials.</p>
+<h3>Animation direction</h3><p>Motion must explain game state: balls travel continuously, gates visibly open, moving obstacles show their effect, and upgrades produce immediate feedback. Avoid decorative animation that obscures ball motion.</p>
+<h3>Interface presentation</h3><p>Keep the primary action, credits, damage state, upgrade costs, and current upgrade effects visible. Secondary controls may remain behind the existing options control.</p>
+<h3>Visual readability</h3><p>Maintain clear contrast between balls, route surfaces, hazards, gates, labels, and the background. Preserve readable labels from the default camera and at the 1440×900 target viewport.</p>''',
+    "gameplay_systems": '''<ul><li>Ball spawning: manual and automatic spawning with a 300-ball cap and limited shadow casters.</li><li>Economy: credits fund spawn-rate, ball-value, and ball-damage upgrades.</li><li>Damage gates: moving balls damage gates; lethal hits open the route without deleting the traversing ball.</li><li>Route generation: eleven unique attachment types connect through entry and exit ports.</li><li>Traversal: motion assists, conveyors, portals, moving obstacles, and finish detection keep balls moving through the route.</li><li>Camera and interface: keyboard and mouse camera controls, interface visibility, and compact optional controls.</li></ul>''',
+    "gameplay": '''<ol><li>Drop balls into the funnel.</li><li>Use ball impacts to open the entry gate.</li><li>Route balls through all eleven generated sections to the finish.</li><li>Earn credits and choose upgrades for spawn rate, value, or damage.</li><li>Generate another route and continue progression.</li></ol>
+<h3>Controls</h3><table><tbody><tr><th>Space</th><td>Drop a ball</td></tr><tr><th>1 / 2 / 3</th><td>Buy spawn-rate, ball-value, or ball-damage upgrade</td></tr><tr><th>T</th><td>Toggle automatic spawning</td></tr><tr><th>G</th><td>Generate a new route</td></tr><tr><th>W / A / S / D, E / C</th><td>Move the camera</td></tr><tr><th>Middle drag / Shift + middle drag / wheel</th><td>Orbit, pan, and zoom</td></tr><tr><th>Tab</th><td>Hide or show the interface</td></tr><tr><th>R</th><td>Reset the camera</td></tr></tbody></table>''',
+}
+
 
 def items(values):
     return "<ul>" + "".join(f"<li>{html.escape(str(value))}</li>" for value in values) + "</ul>" if values else "None"
@@ -60,7 +70,7 @@ def render(state):
     panels = []
     for subject, label in PRODUCT_TABS:
         selected = [p for p in priorities if p["subject"] == subject]
-        panels.append(f'<section id="{subject}" class="panel"><h2>{label}</h2>{table(selected, False)}</section>')
+        panels.append(f'<section id="{subject}" class="panel"><h2>{label}</h2>{PRODUCT_CONTENT[subject]}<h3>Priorities</h3>{table(selected, False)}</section>')
     completed_operations = [p for p in priorities if p["subject"] == "operations" and p["status"] == "completed"]
     return f'''<!doctype html>
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">

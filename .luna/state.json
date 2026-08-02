@@ -4,12 +4,12 @@
     "repository": "bknepprath/ball-routing-prototype",
     "default_branch": "main",
     "production_branch": "codex/cloud-production",
-    "pull_request": 1
+    "pull_request": null
   },
   "orchestrator": {
     "status": "ready",
-    "last_run_at": "2026-08-02T04:04:45Z",
-    "last_run_id": "RUN-20260802T040445Z-WORKFLOW",
+    "last_run_at": "2026-08-02T04:08:48Z",
+    "last_run_id": "RUN-20260802T040848Z-PR2-CORRECTION",
     "next_action": "implement_P-002"
   },
   "limits": {
@@ -128,8 +128,10 @@
       "recipient": "codex-platform-pull-request-writeback",
       "priority": "P-001",
       "status": "ready_for_writeback",
+      "pull_request": 2,
+      "writeback_id": "PR-2-update-branch",
       "durable_evidence": [
-        "The workflow repair is committed locally with the complete generated PRD diff.",
+        "The workflow repair and review correction are committed locally with the complete generated PRD diff.",
         "No Git remote is configured in this checkout; use the Codex platform pull-request/writeback mechanism for the codex/cloud-production branch.",
         "No product priority status changed and P-002 implementation was not started."
       ]
@@ -138,7 +140,9 @@
       "sender": "game-production-orchestrator",
       "recipient": "codex-platform-pull-request-writeback",
       "priority": "P-001",
-      "status": "ready_for_writeback",
+      "status": "written_back_and_merged",
+      "pull_request": 1,
+      "writeback_id": "PR-1-platform-writeback",
       "durable_evidence": [
         "No Git remote is configured in this Codex Cloud checkout, so no push was attempted or claimed.",
         "Write back the complete committed repository diff based on source commit 1709ec690867a0daee3b93845c531ea3aea73230 to the codex/cloud-production pull request.",
@@ -147,6 +151,25 @@
     }
   ],
   "run_history": [
+    {
+      "run_id": "RUN-20260802T040848Z-PR2-CORRECTION",
+      "started_at": "2026-08-02T04:08:48Z",
+      "finished_at": "2026-08-02T04:08:48Z",
+      "status": "completed",
+      "bounded_pass": 1,
+      "implementation_priorities_started": 0,
+      "active_priority_count_at_start": 3,
+      "active_priority_count_at_end": 3,
+      "actions": [
+        "Restored stable substantive product content to every generated product tab while retaining subject-specific priority tables.",
+        "Bound every documented Godot command to 180 seconds without running Godot.",
+        "Cleared the merged PR #1 project pointer and recorded PR #1 and PR #2 writeback identifiers in durable handoffs.",
+        "Stopped after the PR #2 workflow review correction without starting P-002 or changing product priority statuses."
+      ],
+      "direct_git_remote": false,
+      "push_status": "pending_platform_writeback",
+      "writeback": "PR-2-update-branch"
+    },
     {
       "run_id": "RUN-20260802T040445Z-WORKFLOW",
       "started_at": "2026-08-02T04:04:45Z",
