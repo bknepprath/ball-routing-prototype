@@ -7,10 +7,10 @@
     "pull_request": null
   },
   "orchestrator": {
-    "status": "ready",
-    "last_run_at": "2026-08-02T05:30:10Z",
-    "last_run_id": "RUN-20260802T053010Z-COLD-IMPORT",
-    "next_action": "implement_P-002"
+    "status": "blocked",
+    "last_run_at": "2026-08-02T06:12:37Z",
+    "last_run_id": "RUN-20260802T061237Z-LUNA-BLOCKED",
+    "next_action": "retry_when_codex_cloud_supports_luna_max"
   },
   "limits": {
     "max_active_priorities": 30,
@@ -124,6 +124,18 @@
   ],
   "handoffs": [
     {
+      "sender": "game-production-orchestrator",
+      "recipient": "codex-cloud-model-access",
+      "priority": "P-002",
+      "status": "blocked_model_unavailable",
+      "durable_evidence": [
+        "Codex Cloud task https://chatgpt.com/codex/cloud/tasks/task_e_6a6eddaea2388323afcb3b5e5d0b8c0f was created for bknepprath/ball-routing-prototype on codex/cloud-production in environment 6a6e9f986d1c8191a3bf2cc175693080.",
+        "The visible task status reported actual active model GPT-5.6 Sol, required model Luna with Max reasoning, and unverified per-agent Luna Max inheritance.",
+        "The task stopped before production work; no brainstormers, code agent, review agent, validation agent, game build, or game validation ran.",
+        "Retry only when Codex Cloud exposes Luna with Max for the orchestrator and child agents, or the requirement is explicitly relaxed."
+      ]
+    },
+    {
       "sender": "cold-import-infrastructure-agent",
       "recipient": "codex-platform-pull-request-writeback",
       "priority": "P-001",
@@ -165,6 +177,30 @@
     }
   ],
   "run_history": [
+    {
+      "run_id": "RUN-20260802T061237Z-LUNA-BLOCKED",
+      "started_at": "2026-08-02T06:12:37Z",
+      "finished_at": "2026-08-02T06:12:37Z",
+      "status": "blocked",
+      "bounded_pass": 0,
+      "implementation_priorities_started": 0,
+      "active_priority_count_at_start": 3,
+      "active_priority_count_at_end": 3,
+      "actions": [
+        "Verified the existing Codex Cloud environment, repository, production branch, and authoritative workflow files.",
+        "Created the bounded cloud task and confirmed its visible blocked status before production work.",
+        "Recorded the actual GPT-5.6 Sol model, required Luna Max model, and unavailable per-agent Luna Max inheritance.",
+        "Did not spawn brainstorming agents or substitute another model; no local game build or validation ran.",
+        "Persisted the blocker and resumable next action for a future Cloud run."
+      ],
+      "direct_git_remote": true,
+      "push_status": "not_attempted_blocked_model",
+      "writeback": "none_blocked_before_work",
+      "cloud_task_url": "https://chatgpt.com/codex/cloud/tasks/task_e_6a6eddaea2388323afcb3b5e5d0b8c0f",
+      "actual_model": "gpt-5.6-sol",
+      "required_model": "gpt-5.6-luna",
+      "required_reasoning_effort": "max"
+    },
     {
       "run_id": "RUN-20260802T053010Z-COLD-IMPORT",
       "started_at": "2026-08-02T05:22:30Z",
