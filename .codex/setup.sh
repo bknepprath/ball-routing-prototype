@@ -12,6 +12,5 @@ if [[ ! -x "$bin" ]] || [[ "$($bin --version)" != "$version"* ]]; then
   chmod +x "$bin"
   rm -f "$archive"
 fi
-grep -qxF 'export PATH="$HOME/.local/bin:$PATH"' "$HOME/.bashrc" 2>/dev/null || echo 'export PATH="$HOME/.local/bin:$PATH"' >> "$HOME/.bashrc"
+sudo ln -sf "$bin" /usr/local/bin/godot
 "$bin" --headless --path . --editor --quit
-
