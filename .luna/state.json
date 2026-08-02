@@ -8,9 +8,9 @@
   },
   "orchestrator": {
     "status": "ready",
-    "last_run_at": "2026-08-02T05:14:00Z",
-    "last_run_id": "RUN-20260802T051400Z-P002-REREVIEW",
-    "next_action": "gameplay_code_agent_address_P-002_import_and_1440x900_evidence"
+    "last_run_at": "2026-08-02T06:00:00Z",
+    "last_run_id": "RUN-20260802T060000Z-P002-INTEGRATION",
+    "next_action": "gameplay_code_agent_rerun_P-002_cold_import_and_1440x900_evidence"
   },
   "limits": {
     "max_active_priorities": 30,
@@ -185,6 +185,33 @@
   ],
   "handoffs": [
     {
+      "sender": "cloud-integration-agent",
+      "recipient": "Gameplay Code Agent",
+      "priority": "P-002",
+      "status": "changes_required",
+      "pull_request": 3,
+      "branch": "codex/run-gameplay-code-agent-for-p-002",
+      "durable_evidence": [
+        "Merged codex/cloud-production commit ba58026e0312f52b295fbf9c5d4f60226a04d786 into the existing P-002 feature branch without changing gameplay code.",
+        "Preserved the complete P-002 implementation, review, correction, changes_required, and active-lock history while adding the production cold-import infrastructure run, handoff, and evidence.",
+        "Use the integrated cold-import repair to rerun the bounded editor and targeted room-runtime checks; keep P-002 unchecked and its implementation lock active pending independent approval."
+      ]
+    },
+    {
+      "sender": "cold-import-infrastructure-agent",
+      "recipient": "codex-platform-pull-request-writeback",
+      "priority": "P-001",
+      "status": "ready_for_writeback",
+      "pull_request": 2,
+      "writeback_id": "PR-2-cold-import-repair",
+      "durable_evidence": [
+        "The bounded infrastructure repair is committed locally for writeback to codex/cloud-production; no Git remote is configured.",
+        "Raw Blender sources and backups moved from assets to the Godot-ignored blender/sources directory while runtime GLBs remained in assets.",
+        "A cold Godot 4.5.1 editor import completed after removing only the generated .godot cache; Blender 4.0.2 remains installed.",
+        "P-002, P-003, and P-004 statuses and all locks were left unchanged."
+      ]
+    },
+    {
       "sender": "workflow-repair-agent",
       "recipient": "codex-platform-pull-request-writeback",
       "priority": "P-001",
@@ -316,6 +343,53 @@
     }
   ],
   "run_history": [
+    {
+      "run_id": "RUN-20260802T060000Z-P002-INTEGRATION",
+      "started_at": "2026-08-02T06:00:00Z",
+      "finished_at": "2026-08-02T06:00:00Z",
+      "status": "completed",
+      "bounded_pass": 1,
+      "implementation_priorities_started": 0,
+      "active_priority_count_at_start": 3,
+      "active_priority_count_at_end": 3,
+      "actions": [
+        "Integrated codex/cloud-production commit ba58026e0312f52b295fbf9c5d4f60226a04d786 into the existing P-002 feature branch and PR #3.",
+        "Resolved canonical state by preserving the complete P-002 feature history and active lock alongside the production cold-import infrastructure run, handoff, and evidence.",
+        "Kept P-003 and P-004 unchanged and made no gameplay-code or new-priority changes.",
+        "Regenerated the PRD from canonical state; JSON, renderer drift, project-file, conflict-marker, and diff checks passed.",
+        "Removed only the generated .godot cache and completed `timeout 180 godot --headless --path . --editor --quit` from a clean cold-import state.",
+        "`timeout 180 godot --headless --path . --script tests/test_room_runtime.gd` reached the pre-existing line 14 `Moving wall has no collision shape` assertion and did not provide successful P-002 layout evidence."
+      ],
+      "source_commit": "ba58026e0312f52b295fbf9c5d4f60226a04d786",
+      "direct_git_remote": false,
+      "push_status": "pending_platform_writeback",
+      "writeback": "PR-3-cloud-production-integration"
+    },
+    {
+      "run_id": "RUN-20260802T053010Z-COLD-IMPORT",
+      "started_at": "2026-08-02T05:22:30Z",
+      "finished_at": "2026-08-02T05:30:10Z",
+      "status": "completed_with_test_failures",
+      "bounded_pass": 1,
+      "implementation_priorities_started": 0,
+      "active_priority_count_at_start": 3,
+      "active_priority_count_at_end": 3,
+      "actions": [
+        "Moved the three tracked .blend sources and two tracked .blend1 backups from assets to blender/sources, added blender/.gdignore, and removed obsolete tracked .blend.import metadata.",
+        "Updated all four Blender generation/preview scripts so .blend sources use blender/sources and runtime GLB or preview outputs remain in assets.",
+        "Added project assertions covering the three runtime GLBs, relocated sources, and absence of raw .blend files from assets.",
+        "Removed only the generated .godot cache from the initially clean task checkout and completed `timeout 180 godot --headless --path . --editor --quit` from cold state.",
+        "`python tests/test_project_files.py` passed and Blender 4.0.2 remained installed.",
+        "`timeout 180 godot --headless --path . --script tests/test_room_runtime.gd` reported `Moving wall has no collision shape`.",
+        "`timeout 180 godot --headless --path . --script tests/test_level_chain_runtime.gd` reported `Generation 0 did not produce both arc directions`.",
+        "`timeout 180 godot --headless --path . --script tests/test_multi_ball_flow_runtime.gd` reported `Auto-spawn flow deadlocked before the finish`.",
+        "`timeout 180 godot --headless --path . --script tests/test_ball_load_runtime.gd` reported `Load test exceeded the shadow caster budget`.",
+        "Kept the run infrastructure-only and did not change P-002, P-003, or P-004 status or locks."
+      ],
+      "direct_git_remote": false,
+      "push_status": "pending_platform_writeback",
+      "writeback": "PR-2-cold-import-repair"
+    },
     {
       "run_id": "RUN-20260802T050100Z-P002-REVIEW",
       "started_at": "2026-08-02T05:01:00Z",
