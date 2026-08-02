@@ -2283,6 +2283,20 @@ func _build_ui() -> void:
 	stop_progress.add_theme_stylebox_override("fill", stop_progress_fill)
 	box.add_child(stop_progress)
 
+	var first_session_prompt := Label.new()
+	first_session_prompt.name = "FirstSessionPrompt"
+	first_session_prompt.text = "Space drops a ball.\nBall impacts open the STOP gate."
+	first_session_prompt.add_theme_font_size_override("font_size", 14)
+	first_session_prompt.add_theme_color_override("font_color", Color("f4f7fb"))
+	box.add_child(first_session_prompt)
+
+	var drop_button := Button.new()
+	drop_button.name = "DropBallButton"
+	drop_button.text = "Drop ball  [Space]"
+	drop_button.pressed.connect(_spawn_ball)
+	_style_button(drop_button)
+	box.add_child(drop_button)
+
 	ui_options_button = Button.new()
 	ui_options_button.name = "OptionsButton"
 	ui_options_button.text = "Options"
@@ -2295,12 +2309,6 @@ func _build_ui() -> void:
 	ui_options.visible = false
 	ui_options.add_theme_constant_override("separation", 5)
 	box.add_child(ui_options)
-
-	var drop_button := Button.new()
-	drop_button.text = "Drop ball  [Space]"
-	drop_button.pressed.connect(_spawn_ball)
-	_style_button(drop_button)
-	ui_options.add_child(drop_button)
 
 	stop_button = Button.new()
 	stop_button.text = "Spawn rate  [1]"

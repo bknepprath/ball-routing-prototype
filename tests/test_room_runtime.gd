@@ -91,6 +91,18 @@ func _init() -> void:
 	assert(options_button != null, "Compact options button is missing")
 	var options_container := scene.find_child("Options", true, false)
 	assert(options_container != null and not options_container.visible, "Options are expanded by default")
+	var first_session_prompt := scene.find_child("FirstSessionPrompt", true, false) as Label
+	assert(first_session_prompt != null, "First-session instructions are missing")
+	assert(first_session_prompt.text == "Space drops a ball.\nBall impacts open the STOP gate.", "First-session instructions do not explain how to drop a ball and open the STOP gate")
+	assert(first_session_prompt.visible, "First-session instructions are hidden by default")
+	var drop_ball_button := scene.find_child("DropBallButton", true, false) as Button
+	assert(drop_ball_button != null and drop_ball_button.visible, "Primary drop-ball action is hidden by default")
+	assert(not options_container.is_ancestor_of(first_session_prompt), "First-session instructions are inside optional controls")
+	assert(not options_container.is_ancestor_of(drop_ball_button), "Primary drop-ball action is inside optional controls")
+	for required_control in [first_session_prompt, drop_ball_button]:
+		var control_rect: Rect2 = required_control.get_global_rect()
+		assert(control_rect.position.x >= 0.0 and control_rect.position.y >= 0.0, "%s extends above or left of the 1440x900 viewport" % required_control.name)
+		assert(control_rect.end.x <= 1440.0 and control_rect.end.y <= 900.0, "%s extends beyond the 1440x900 viewport" % required_control.name)
 	var damage_button := scene.find_child("DamageButton", true, false)
 	assert(damage_button != null, "Ball damage upgrade is missing")
 	var damage_before: float = scene.ball_damage
