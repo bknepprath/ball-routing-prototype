@@ -13,4 +13,3 @@ if [[ ! -x "$bin" ]] || [[ "$($bin --version)" != "$version"* ]]; then
   rm -f "$archive"
 fi
 sudo ln -sf "$bin" /usr/local/bin/godot
-"$bin" --headless --path . --editor --quit
