@@ -1,6 +1,11 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+if ! command -v blender >/dev/null; then
+  sudo apt-get update
+  sudo apt-get install -y --no-install-recommends blender
+fi
+
 version=4.5.1
 bin="$HOME/.local/bin/godot"
 if [[ ! -x "$bin" ]] || [[ "$($bin --version)" != "$version"* ]]; then
