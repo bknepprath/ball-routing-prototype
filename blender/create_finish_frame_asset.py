@@ -6,6 +6,7 @@ import bpy
 
 PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 ASSET_DIR = os.path.join(PROJECT_ROOT, "assets")
+SOURCE_DIR = os.path.join(PROJECT_ROOT, "blender", "sources")
 OUTPUT = os.path.join(ASSET_DIR, "finish_frame.glb")
 
 
@@ -30,6 +31,7 @@ def make_material(name, color, metallic=0.0, roughness=0.6, emission=None):
 
 def build():
     os.makedirs(ASSET_DIR, exist_ok=True)
+    os.makedirs(SOURCE_DIR, exist_ok=True)
     clear_scene()
     frame_material = make_material("FinishFrame", (0.82, 0.42, 0.07), metallic=0.35, roughness=0.32, emission=(0.18, 0.05, 0.005))
     bpy.ops.mesh.primitive_torus_add(
@@ -42,7 +44,7 @@ def build():
     frame = bpy.context.object
     frame.name = "FinishFrame"
     frame.data.materials.append(frame_material)
-    bpy.ops.wm.save_as_mainfile(filepath=os.path.join(ASSET_DIR, "finish_frame.blend"))
+    bpy.ops.wm.save_as_mainfile(filepath=os.path.join(SOURCE_DIR, "finish_frame.blend"))
     bpy.ops.object.select_all(action="SELECT")
     bpy.ops.export_scene.gltf(filepath=OUTPUT, export_format="GLB", use_selection=True, export_apply=True)
 
