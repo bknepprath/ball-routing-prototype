@@ -40,4 +40,4 @@ There is no separate build step. Godot imports and validates the project with th
 - `.luna/state.json` is authoritative for queues, locks, reviews, and handoffs. Persist every transition in the repository.
 - Use the dedicated `codex/cloud-production` branch or its pull request. Never merge into the default branch without explicit user authorization.
 - Each run must be bounded, release failed or expired locks, persist results, and exit.
-
+- After changing `.luna/state.json` or the PRD renderer, regenerate with `python .luna/render_prd.py`; validate committed PRD synchronization with `python .luna/render_prd.py --check`.
