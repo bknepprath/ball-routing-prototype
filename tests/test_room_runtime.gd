@@ -100,7 +100,7 @@ func _init() -> void:
 	assert(not options_container.is_ancestor_of(first_session_prompt), "First-session instructions are inside optional controls")
 	assert(not options_container.is_ancestor_of(drop_ball_button), "Primary drop-ball action is inside optional controls")
 	for required_control in [first_session_prompt, drop_ball_button]:
-		var control_rect := required_control.get_global_rect()
+		var control_rect: Rect2 = required_control.get_global_rect()
 		assert(control_rect.position.x >= 0.0 and control_rect.position.y >= 0.0, "%s extends above or left of the 1440x900 viewport" % required_control.name)
 		assert(control_rect.end.x <= 1440.0 and control_rect.end.y <= 900.0, "%s extends beyond the 1440x900 viewport" % required_control.name)
 	var damage_button := scene.find_child("DamageButton", true, false)
